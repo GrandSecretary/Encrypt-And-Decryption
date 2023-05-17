@@ -9,6 +9,10 @@ namespace Encryption
 {
     internal class Program
     {
+        /// <summary>
+        /// показує масив з даних
+        /// </summary>
+        /// <param name="array">Масив, який треба показати</param>
         static void ShowArray(string[] array)
         {
             foreach(var item in array)
@@ -17,19 +21,24 @@ namespace Encryption
             }
             Console.WriteLine();
         }
+        /// <summary>
+        /// S-блокове шифрування
+        /// </summary>
+        /// <param name="binary">Масив бітів, які треба зашифрувати</param>
+        /// <returns>Зашифрований масив бітів</returns>
         static string[] S_BlockEncryption(string[] binary)
         {
-            string[] tetrads = new string[binary.Length * 2];
-
+            string[] tetrads = new string[binary.Length * 2]; //оголошення масив тетрадів
+            //розбиття блоки бітів у тетради по 4 біти
             for (int i = 0, j = 0; i < binary.Length; i++, j+=2)
             {
                 tetrads[j] = binary[i].Substring(0, binary[i].Length / 2);
                 tetrads[j + 1] = binary[i].Substring(binary[i].Length / 2);
             }
+            //оголошення нового масиву шифрованих тетрадів
+            string[] newTetrads = new string[tetrads.Length]; 
 
-            string[] newTetrads = new string[tetrads.Length];
-
-            for (int i = 0; i < tetrads.Length; i++)
+            for (int i = 0; i < tetrads.Length; i++)//процес S-блокового шифрування
             {
                 switch (tetrads[i])
                 {
@@ -52,9 +61,9 @@ namespace Encryption
 
                 }
             }
-
+            //оголошення нового масиву бінарних бітів в текстовому представленні
             string[] newBinary = new string[binary.Length];
-
+            //об'єдання тетрадів в 8 бітні блоки 
             for (int i = 0, j = 0; i < binary.Length; i++, j += 2)
             {
                 newBinary[i] = newTetrads[j] + newTetrads[j + 1];
@@ -62,11 +71,17 @@ namespace Encryption
 
             return newBinary;
         }
+        /// <summary>
+        /// P-блокове шифрування
+        /// </summary>
+        /// <param name="binary">Масив бітів, які треба зашифрувати</param>
+        /// <returns>Зашифрований масив бітів</returns>
         static string[] P_BlockEncryption(string[] binary)
         {
-            string[] newBinaty = new string[binary.Length];
+            //оголошення нового масиву бінарних бітів в текстовому представленні 
+            string[] newBinary = new string[binary.Length];
 
-
+            //процес P-блокового шифрування
             for (int i = 0; i < binary.Length; i++)
             {
                 char[] bits = new char[8];
@@ -86,16 +101,22 @@ namespace Encryption
                     }
                     
                 }
-                newBinaty[i] = new string(bits);
+                newBinary[i] = new string(bits);
             }
             
-            return newBinaty;
+            return newBinary;
         }
+        /// <summary>
+        /// P-блокове дешифрування
+        /// </summary>
+        /// <param name="binary">Масив бітів, які треба дешифрувати</param>
+        /// <returns>Дешифрований масив бітів</returns>
         static string[] P_BlockDecryption(string[] binary)
         {
+            //оголошення нового масиву бінарних бітів в текстовому представленні
             string[] newBinaty = new string[binary.Length];
 
-
+            //процес P-блокового дешифрування
             for (int i = 0; i < binary.Length; i++)
             {
                 char[] bits = new char[8];
@@ -120,19 +141,25 @@ namespace Encryption
 
             return newBinaty;
         }
+        /// <summary>
+        /// S-блокове дешифрування
+        /// </summary>
+        /// <param name="binary">Масив бітів, які треба дешифрувати</param>
+        /// <returns>Дешифрований масив бітів</returns>
         static string[] S_BlockDecryption(string[] binary)
         {
-            string[] tetrads = new string[binary.Length * 2];
+            string[] tetrads = new string[binary.Length * 2];//оголошення масив тетрадів
+            //розбиття блоки бітів у тетради по 4 біти
 
             for (int i = 0, j = 0; i < binary.Length; i++, j += 2)
             {
                 tetrads[j] = binary[i].Substring(0, binary[i].Length / 2);
                 tetrads[j + 1] = binary[i].Substring(binary[i].Length / 2);
             }
-
+            //оголошення нового масиву шифрованих тетрадів
             string[] newTetrads = new string[tetrads.Length];
 
-            for (int i = 0; i < tetrads.Length; i++)
+            for (int i = 0; i < tetrads.Length; i++)//процес S-блокового шифрування
             {
                 switch (tetrads[i])
                 {
@@ -155,9 +182,9 @@ namespace Encryption
 
                 }
             }
-
+            //оголошення нового масиву бінарних бітів в текстовому представленні
             string[] newBinary = new string[binary.Length];
-
+            //об'єдання тетрадів в 8 бітні блоки 
             for (int i = 0, j = 0; i < binary.Length; i++, j += 2)
             {
                 newBinary[i] = newTetrads[j] + newTetrads[j + 1];
@@ -165,32 +192,23 @@ namespace Encryption
 
             return newBinary;
         }
-        static byte[] BinaryToBytes(string binaryCode)
-        {
-            int byteCount = binaryCode.Length / 8;
-            byte[] bytes = new byte[byteCount];
-            
-            for(int i = 0; i< byteCount; i++)
-            {
-                string byteString = binaryCode.Substring(i * 8, 8);
-                bytes[i] = Convert.ToByte(byteString, 2);
-            }
-
-            return bytes;
-        }
+        
         static void Main(string[] args)
         {
             
 
             Console.Write("Enter the text you want to encrypt: ");
             string text = Console.ReadLine();
-
-            byte[] bytes = Encoding.UTF8.GetBytes(text);
-
+            
+            //отримання байтів з тексту
+            byte[] bytes = Encoding.UTF8.GetBytes(text); 
+            
+            //масив бітів в текстовому представленні
             string[] binaryCodes = new string[bytes.Length];
 
             for (int i = 0; i < bytes.Length; i++)
             {
+                //конвертація байту в послідовність бітів
                 binaryCodes[i] = Convert.ToString(bytes[i], 2).PadLeft(8, '0');
             }
 
@@ -209,9 +227,30 @@ namespace Encryption
                 string binaryByte = binaryString.Substring(i * 8, 8);
                 bytes[i] = Convert.ToByte(binaryByte, 2);
             }
-
+            
+            //перетворення масиву з байтів в шифр-текст
             string encryptedText = Encoding.UTF8.GetString(bytes);
             Console.WriteLine("Ciphertext: " + encryptedText);
+
+            binaryCodes = P_BlockDecryption(binaryCodes);
+
+            binaryCodes = S_BlockDecryption(binaryCodes);
+
+            Console.Write("Decrypted bits: "); ShowArray(binaryCodes);
+            // Об'єднання двійкових кодів в одну строку
+            binaryString = string.Join("", binaryCodes);
+
+            // Перетворення двійкової строки в масив байтів
+            bytes = new byte[binaryString.Length / 8];
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                string binaryByte = binaryString.Substring(i * 8, 8);
+                bytes[i] = Convert.ToByte(binaryByte, 2);
+            }
+
+            //перетворення масиву з байтів у відкритий текст
+            encryptedText = Encoding.UTF8.GetString(bytes);
+            Console.WriteLine("Plain text: " + encryptedText);
         }
     }
 }
